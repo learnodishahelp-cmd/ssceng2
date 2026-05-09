@@ -1,0 +1,1042 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SSC Synonyms & Antonyms Quiz</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🔤</text></svg>">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;800&family=DM+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/10.7.1/firebase-database-compat.js"></script>
+<style>
+:root {
+  --ink:      #1a1a2e;
+  --ink-2:    #2d2d4a;
+  --cream:    #f9f5ee;
+  --gold:     #c9a84c;
+  --gold-lt:  #f0e0b0;
+  --teal:     #0f8b8d;
+  --teal-lt:  #d0eff0;
+  --rose:     #c2185b;
+  --rose-lt:  #fce4ec;
+  --sage:     #4caf88;
+  --sage-lt:  #dcf5eb;
+  --text:     #1a1a2e;
+  --text-2:   #4a4a6a;
+  --text-3:   #8888aa;
+  --card:     #ffffff;
+  --border:   #e8e3d8;
+  --shadow:   0 8px 40px rgba(26,26,46,0.13), 0 2px 8px rgba(26,26,46,0.06);
+  --r:        18px;
+  --r-sm:     10px;
+  --r-pill:   60px;
+  --t:        0.22s cubic-bezier(.4,0,.2,1);
+  --font-h:   'Playfair Display', Georgia, serif;
+  --font-b:   'DM Sans', system-ui, sans-serif;
+}
+
+*{margin:0;padding:0;box-sizing:border-box;}
+html{font-size:16px;-webkit-tap-highlight-color:transparent;}
+
+body{
+  font-family:var(--font-b);
+  background: var(--cream);
+  background-image:
+    radial-gradient(ellipse 80% 60% at 10% 0%, rgba(201,168,76,.18) 0%, transparent 60%),
+    radial-gradient(ellipse 60% 50% at 90% 100%, rgba(15,139,141,.15) 0%, transparent 55%),
+    url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23c9a84c' fill-opacity='0.04'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:16px;
+  color:var(--text);
+  -webkit-font-smoothing:antialiased;
+}
+
+.wrap{
+  width:100%;max-width:580px;
+  background:var(--card);
+  border-radius:24px;
+  box-shadow:var(--shadow);
+  overflow:hidden;
+  min-height:520px;
+  display:flex;flex-direction:column;
+  border:1.5px solid var(--border);
+}
+
+/* ── TOP STRIPE ── */
+.top-stripe{
+  height:6px;
+  background:linear-gradient(90deg, var(--gold) 0%, var(--teal) 50%, var(--rose) 100%);
+}
+
+/* ── SCREENS ── */
+.screen{
+  display:none;flex-direction:column;flex:1;
+  padding:30px 28px 26px;
+  animation:fadeUp .35s ease-out;
+}
+.screen.active{display:flex;}
+@keyframes fadeUp{from{opacity:0;transform:translateY(16px);}to{opacity:1;transform:translateY(0);}}
+
+/* ── BUTTONS ── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 30px;border-radius:var(--r-pill);font-size:.97rem;font-weight:600;
+  cursor:pointer;border:none;transition:all var(--t);font-family:var(--font-b);
+  letter-spacing:.01em;white-space:nowrap;user-select:none;
+}
+.btn:active{transform:scale(.96);}
+.btn:disabled{opacity:.45;cursor:not-allowed;pointer-events:none;}
+
+.btn-gold{
+  background:linear-gradient(135deg,#c9a84c,#e8c96a);
+  color:var(--ink);box-shadow:0 4px 18px rgba(201,168,76,.35);
+  font-size:1.02rem;padding:15px 38px;
+}
+.btn-gold:hover{box-shadow:0 6px 26px rgba(201,168,76,.48);transform:translateY(-2px);}
+
+.btn-teal{background:var(--teal);color:#fff;box-shadow:0 4px 14px rgba(15,139,141,.3);}
+.btn-teal:hover{box-shadow:0 6px 22px rgba(15,139,141,.42);transform:translateY(-2px);}
+
+.btn-outline{background:#fff;color:var(--teal);border:2px solid var(--teal);}
+.btn-outline:hover{background:var(--teal-lt);}
+
+.btn-sm{padding:9px 20px;font-size:.86rem;}
+
+/* ── START SCREEN ── */
+.start-screen{align-items:center;justify-content:center;text-align:center;gap:18px;padding:40px 28px;}
+.guest-content,.returning-content{display:flex;flex-direction:column;align-items:center;gap:18px;width:100%;}
+.returning-content{display:none;}
+
+.logo-wrap{position:relative;display:inline-block;}
+.logo-icon{font-size:60px;display:block;animation:float 3s ease-in-out infinite;}
+@keyframes float{0%,100%{transform:translateY(0);}50%{transform:translateY(-14px);}}
+
+.badge-row{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;}
+.tag{
+  font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;
+  padding:4px 12px;border-radius:var(--r-pill);
+  border:1.5px solid var(--gold);color:var(--gold);background:rgba(201,168,76,.08);
+}
+.tag.teal-tag{border-color:var(--teal);color:var(--teal);background:rgba(15,139,141,.08);}
+
+.start-screen h1{
+  font-family:var(--font-h);font-size:2rem;font-weight:800;
+  color:var(--ink);line-height:1.2;
+}
+.start-screen h1 span{color:var(--gold);}
+.subtitle{font-size:.93rem;color:var(--text-2);max-width:340px;line-height:1.55;}
+
+.info-pills{display:flex;gap:10px;flex-wrap:wrap;justify-content:center;}
+.pill{
+  display:flex;flex-direction:column;align-items:center;gap:2px;
+  background:#fafaf8;border:1.5px solid var(--border);
+  border-radius:var(--r);padding:12px 18px;min-width:90px;
+}
+.pill .pi{font-size:22px;}
+.pill .pv{font-size:1.1rem;font-weight:700;color:var(--ink);}
+.pill .pl{font-size:.73rem;color:var(--text-3);font-weight:500;}
+
+.welcome-msg{
+  font-family:var(--font-h);font-size:1.4rem;font-weight:700;color:var(--ink);
+}
+
+.history-box{
+  width:100%;max-width:420px;
+  background:#fafaf8;border:1.5px solid var(--border);border-radius:var(--r);padding:16px;text-align:left;
+}
+.history-box h4{font-size:.9rem;font-weight:700;color:var(--ink);margin-bottom:10px;}
+.history-list{display:flex;flex-direction:column;gap:7px;max-height:175px;overflow-y:auto;}
+.history-item{
+  display:flex;justify-content:space-between;align-items:center;
+  font-size:.81rem;padding:8px 12px;
+  background:#fff;border-radius:8px;border:1px solid var(--border);
+}
+.history-score{font-weight:700;color:var(--teal);}
+.history-date{color:var(--text-3);font-size:.74rem;}
+.change-user-btn{background:none;border:none;color:var(--rose);font-size:.79rem;cursor:pointer;text-decoration:underline;margin-top:4px;}
+
+/* ── NAME SCREEN ── */
+.name-screen{align-items:center;justify-content:center;text-align:center;gap:22px;padding:40px 28px;}
+.name-icon{font-size:52px;}
+.name-screen h2{font-family:var(--font-h);font-size:1.7rem;font-weight:800;color:var(--ink);}
+.name-screen p{font-size:.9rem;color:var(--text-2);max-width:310px;line-height:1.55;}
+.field-wrap{width:100%;max-width:350px;display:flex;flex-direction:column;gap:11px;}
+.field{
+  width:100%;padding:13px 20px;border-radius:var(--r-pill);
+  border:2px solid var(--border);font-size:.97rem;font-family:var(--font-b);
+  outline:none;transition:all var(--t);background:#fafaf8;text-align:center;color:var(--text);
+}
+.field:focus{border-color:var(--teal);box-shadow:0 0 0 3px rgba(15,139,141,.12);background:#fff;}
+.field::placeholder{color:var(--text-3);}
+.field-error{font-size:.8rem;color:var(--rose);font-weight:500;min-height:17px;text-align:center;}
+
+/* ── QUIZ SCREEN ── */
+.quiz-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;gap:10px;}
+.q-counter{
+  font-weight:700;font-size:.87rem;color:var(--teal);
+  background:var(--teal-lt);padding:5px 14px;border-radius:var(--r-pill);white-space:nowrap;
+}
+.player-badge{
+  font-weight:600;font-size:.8rem;color:var(--text-2);
+  background:#fafaf8;border:1.5px solid var(--border);
+  padding:4px 12px;border-radius:var(--r-pill);
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px;
+}
+.timer-display{
+  font-weight:700;font-size:.87rem;color:var(--text);
+  background:#fafaf8;padding:5px 14px;border-radius:var(--r-pill);
+  display:flex;align-items:center;gap:6px;white-space:nowrap;transition:color .3s;
+}
+.timer-display.warn{color:var(--gold);}
+.timer-display.urg{color:var(--rose);animation:blink .6s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1;}50%{opacity:.45;}}
+.t-dot{width:8px;height:8px;border-radius:50%;background:currentColor;transition:background .3s;}
+
+.timer-bar-wrap{width:100%;height:5px;background:#ede9df;border-radius:10px;margin-bottom:18px;overflow:hidden;}
+.timer-bar{height:100%;border-radius:10px;background:var(--sage);transition:width .1s linear,background .4s;}
+.timer-bar.warn{background:var(--gold);}
+.timer-bar.urg{background:var(--rose);}
+
+/* category chip */
+.category-chip{
+  display:inline-flex;align-items:center;gap:5px;
+  font-size:.73rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;
+  padding:3px 12px;border-radius:var(--r-pill);margin-bottom:10px;
+}
+.cat-syn{background:var(--teal-lt);color:var(--teal);}
+.cat-ant{background:var(--rose-lt);color:var(--rose);}
+
+.progress-dots{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:16px;justify-content:center;}
+.prog-dot{width:9px;height:9px;border-radius:50%;background:#e8e3d8;transition:all var(--t);flex-shrink:0;}
+.prog-dot.done   {background:var(--sage);transform:scale(1.1);}
+.prog-dot.wrong  {background:var(--rose);transform:scale(1.1);}
+.prog-dot.skip   {background:var(--text-3);transform:scale(1.1);}
+.prog-dot.cur    {background:var(--teal);box-shadow:0 0 0 4px rgba(15,139,141,.2);transform:scale(1.3);animation:dotPulse 1.5s ease-in-out infinite;}
+@keyframes dotPulse{0%,100%{box-shadow:0 0 0 4px rgba(15,139,141,.2);}50%{box-shadow:0 0 0 10px rgba(15,139,141,0);}}
+
+.q-text{
+  font-size:1.08rem;font-weight:600;line-height:1.55;color:var(--text);
+  margin-bottom:18px;padding:15px 18px;
+  background:#fafaf8;border-radius:var(--r);
+  border-left:4px solid var(--gold);min-height:58px;display:flex;align-items:center;
+}
+
+.options-list{display:flex;flex-direction:column;gap:9px;list-style:none;}
+.opt-btn{
+  display:flex;align-items:center;gap:12px;width:100%;
+  padding:13px 15px;border:2px solid var(--border);
+  border-radius:var(--r);background:#fff;
+  cursor:pointer;font-size:.93rem;font-family:var(--font-b);
+  text-align:left;transition:all var(--t);font-weight:500;color:var(--text);
+  user-select:none;
+}
+.opt-btn:hover{border-color:var(--teal);background:#f5fefe;transform:translateX(3px);}
+.opt-btn:active{transform:scale(.985);}
+.opt-letter{
+  display:flex;align-items:center;justify-content:center;
+  width:34px;height:34px;border-radius:50%;background:#f0ebe0;
+  font-weight:700;font-size:.87rem;flex-shrink:0;transition:all var(--t);color:var(--text-2);
+}
+.opt-btn:hover .opt-letter{background:var(--teal-lt);color:var(--teal);}
+.opt-btn.correct{border-color:var(--sage)!important;background:var(--sage-lt)!important;animation:popRight .45s ease-out;}
+.opt-btn.correct .opt-letter{background:var(--sage);color:#fff;}
+.opt-btn.wrong{border-color:var(--rose)!important;background:var(--rose-lt)!important;animation:shake .45s ease-out;}
+.opt-btn.wrong .opt-letter{background:var(--rose);color:#fff;}
+.opt-btn.reveal{border-color:var(--sage)!important;background:#f0fdf6!important;}
+.opt-btn.reveal .opt-letter{background:var(--sage);color:#fff;}
+.opt-btn.dis{pointer-events:none;opacity:.68;}
+.opt-btn.dis:hover{transform:none;border-color:var(--border);background:#fff;}
+@keyframes popRight{0%{transform:scale(1);}30%{transform:scale(1.03);}100%{transform:scale(1);}}
+@keyframes shake{0%,100%{transform:translateX(0);}20%{transform:translateX(-6px);}40%{transform:translateX(5px);}60%{transform:translateX(-4px);}80%{transform:translateX(3px);}}
+
+/* ── RESULT SCREEN ── */
+.result-screen{align-items:center;text-align:center;gap:13px;padding:28px 24px 22px;}
+.result-emoji{font-size:54px;animation:float 2s ease-in-out infinite;}
+.result-name{
+  font-weight:700;font-size:1.05rem;color:var(--teal);
+  background:var(--teal-lt);padding:5px 20px;border-radius:var(--r-pill);
+}
+.score-circle{position:relative;width:130px;height:130px;flex-shrink:0;}
+.score-circle svg{width:100%;height:100%;transform:rotate(-90deg);}
+.bg-ring{fill:none;stroke:#ede9df;stroke-width:10;}
+.progress-ring{fill:none;stroke:var(--sage);stroke-width:10;stroke-linecap:round;transition:stroke-dashoffset 1.2s cubic-bezier(.4,0,.2,1);}
+.score-text{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;font-weight:800;font-size:2.2rem;color:var(--ink);line-height:1;}
+.score-text small{font-size:.7rem;font-weight:500;color:var(--text-3);display:block;}
+.result-msg{font-size:1rem;font-weight:600;color:var(--ink);max-width:320px;}
+.result-detail{font-size:.82rem;color:var(--text-2);}
+
+.save-status{
+  display:flex;align-items:center;gap:8px;font-size:.8rem;font-weight:500;
+  padding:7px 16px;border-radius:var(--r-pill);background:#fafaf8;border:1.5px solid var(--border);
+}
+.save-status.saving{color:var(--gold);border-color:#f0d080;background:#fef9e7;}
+.save-status.saved{color:var(--sage);border-color:#80d0a8;background:var(--sage-lt);}
+.save-status.err{color:var(--rose);border-color:#f0a0b0;background:var(--rose-lt);}
+
+.result-btns{display:flex;gap:9px;flex-wrap:wrap;justify-content:center;width:100%;max-width:380px;}
+
+/* ── REVIEW SCREEN ── */
+.review-screen{gap:0;padding:0;}
+.review-header{
+  position:sticky;top:0;z-index:10;
+  background:var(--card);padding:17px 20px 13px;
+  border-bottom:1.5px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.review-header h2{font-family:var(--font-h);font-size:1.15rem;font-weight:700;color:var(--ink);flex:1;}
+.review-badge{
+  font-size:.8rem;font-weight:700;padding:5px 14px;
+  border-radius:var(--r-pill);background:linear-gradient(135deg,var(--teal),#0da5a8);color:#fff;white-space:nowrap;
+}
+.review-list{flex:1;overflow-y:auto;padding:15px 20px 20px;display:flex;flex-direction:column;gap:14px;}
+.review-list::-webkit-scrollbar{width:4px;}
+.review-list::-webkit-scrollbar-thumb{background:#d5d0c8;border-radius:10px;}
+
+.r-card{border-radius:var(--r);border:2px solid var(--border);overflow:hidden;}
+.r-card.r-correct{border-color:var(--sage);}
+.r-card.r-wrong{border-color:var(--rose);}
+.r-card.r-skip{border-color:var(--text-3);}
+.r-card-hdr{display:flex;align-items:flex-start;gap:9px;padding:13px 15px 11px;background:#fafaf8;}
+.r-card.r-correct .r-card-hdr{background:#f0fdf4;}
+.r-card.r-wrong   .r-card-hdr{background:#fff5f7;}
+.r-card.r-skip    .r-card-hdr{background:#fafaf8;}
+
+.r-q-num{
+  flex-shrink:0;width:27px;height:27px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.76rem;font-weight:700;background:var(--border);color:var(--text-2);
+}
+.r-card.r-correct .r-q-num{background:var(--sage);color:#fff;}
+.r-card.r-wrong   .r-q-num{background:var(--rose);color:#fff;}
+.r-card.r-skip    .r-q-num{background:var(--text-3);color:#fff;}
+
+.r-q-text{font-size:.9rem;font-weight:600;color:var(--text);line-height:1.5;flex:1;}
+.r-card-body{padding:11px 15px 13px;display:flex;flex-direction:column;gap:7px;}
+.r-row{display:flex;align-items:flex-start;gap:8px;font-size:.84rem;}
+.r-label{font-weight:700;white-space:nowrap;font-size:.76rem;padding:3px 8px;border-radius:6px;flex-shrink:0;}
+.label-y{background:var(--rose-lt);color:var(--rose);}
+.label-c{background:var(--sage-lt);color:var(--sage);}
+.label-s{background:#f0ebe0;color:var(--text-3);}
+.r-ans-txt{color:var(--text);line-height:1.4;padding-top:2px;}
+.r-exp{
+  margin-top:4px;padding:9px 13px;
+  background:rgba(15,139,141,.06);border-radius:var(--r-sm);
+  border-left:3px solid var(--teal);
+  font-size:.81rem;color:var(--ink-2);line-height:1.5;
+}
+.r-exp strong{display:block;font-size:.74rem;text-transform:uppercase;letter-spacing:.05em;margin-bottom:2px;color:var(--teal);}
+
+.review-footer{padding:13px 20px;border-top:1.5px solid var(--border);display:flex;gap:9px;justify-content:center;flex-wrap:wrap;}
+
+/* ── RESPONSIVE ── */
+@media(max-width:480px){
+  .wrap{border-radius:20px;}
+  .screen{padding:20px 16px 18px;}
+  .start-screen,.name-screen{padding:28px 16px;gap:13px;}
+  .start-screen h1{font-size:1.5rem;}
+  .name-screen h2{font-size:1.4rem;}
+  .q-text{font-size:.98rem;padding:11px 13px;}
+  .opt-btn{padding:11px 13px;font-size:.88rem;}
+  .opt-letter{width:30px;height:30px;font-size:.79rem;}
+  .btn{padding:11px 22px;font-size:.88rem;}
+  .btn-gold{padding:13px 28px;font-size:.93rem;}
+  .review-list{padding:11px 13px;}
+  .review-header{padding:13px 13px 9px;}
+  .review-footer{padding:11px 13px;}
+  .result-btns .btn{font-size:.8rem;padding:9px 15px;}
+}
+</style>
+</head>
+<body>
+<div class="wrap" id="appWrap">
+  <div class="top-stripe"></div>
+
+  <!-- ══ START SCREEN ══ -->
+  <div class="screen active" id="startScreen">
+    <div class="guest-content" id="guestContent">
+      <div class="logo-wrap"><span class="logo-icon">🔤</span></div>
+      <div class="badge-row">
+        <span class="tag">SSC Pattern</span>
+        <span class="tag teal-tag">Synonyms & Antonyms</span>
+      </div>
+      <h1>Vocabulary <span>Master</span></h1>
+      <p class="subtitle">50 MCQs covering Synonyms &amp; Antonyms — as asked in SSC CGL, CHSL, MTS exams.</p>
+      <div class="info-pills">
+        <div class="pill"><div class="pi">📋</div><div class="pv">50</div><div class="pl">Questions</div></div>
+        <div class="pill"><div class="pi">⏱️</div><div class="pv">60s</div><div class="pl">Per Q</div></div>
+        <div class="pill"><div class="pi">🏆</div><div class="pv">+1</div><div class="pl">Correct</div></div>
+        <div class="pill"><div class="pi">📝</div><div class="pv">0</div><div class="pl">Penalty</div></div>
+      </div>
+      <button class="btn btn-gold" id="btnStart">🚀 Start Quiz</button>
+    </div>
+
+    <div class="returning-content" id="returningContent">
+      <div class="logo-wrap"><span class="logo-icon">🔤</span></div>
+      <div class="welcome-msg" id="welcomeMsg">Welcome back!</div>
+      <div class="history-box">
+        <h4>📊 Your Previous Scores</h4>
+        <div class="history-list" id="historyList"><p style="text-align:center;color:var(--text-3)">Loading…</p></div>
+      </div>
+      <button class="btn btn-gold" id="btnStartReturning">🔄 New Attempt</button>
+      <button class="change-user-btn" id="btnChangeUser">Not you? Register as new user</button>
+    </div>
+  </div>
+
+  <!-- ══ NAME SCREEN ══ -->
+  <div class="screen name-screen" id="nameScreen">
+    <div class="name-icon">👤</div>
+    <h2>Who Are You?</h2>
+    <p>Enter your name and mobile number. Both will be saved with your score.</p>
+    <div class="field-wrap">
+      <input type="text" class="field" id="nameIn" placeholder="Your full name…" maxlength="30" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div class="field-error" id="nameErr"></div>
+      <input type="tel" class="field" id="mobIn" placeholder="10-digit mobile number" maxlength="10" autocomplete="off" inputmode="numeric">
+      <div class="field-error" id="mobErr"></div>
+      <button class="btn btn-gold" id="btnBegin">▶️ Begin Quiz</button>
+      <button class="btn btn-outline btn-sm" id="btnBack">← Back</button>
+    </div>
+  </div>
+
+  <!-- ══ QUIZ SCREEN ══ -->
+  <div class="screen" id="quizScreen">
+    <div class="quiz-header">
+      <span class="q-counter" id="qCounter">Q 1/50</span>
+      <span class="player-badge" id="playerBadge">Player</span>
+      <span class="timer-display" id="timerDisp">
+        <span class="t-dot"></span>
+        <span id="timerTxt">60s</span>
+      </span>
+    </div>
+    <div class="timer-bar-wrap"><div class="timer-bar" id="timerBar"></div></div>
+    <div id="categoryChip"></div>
+    <div class="progress-dots" id="progDots"></div>
+    <div class="q-text" id="qText"></div>
+    <ul class="options-list" id="optsList"></ul>
+  </div>
+
+  <!-- ══ RESULT SCREEN ══ -->
+  <div class="screen result-screen" id="resultScreen">
+    <div class="result-emoji" id="resEmoji">🎉</div>
+    <div class="result-name" id="resName">Player</div>
+    <div class="score-circle">
+      <svg viewBox="0 0 140 140">
+        <circle class="bg-ring" cx="70" cy="70" r="62"/>
+        <circle class="progress-ring" id="resRing" cx="70" cy="70" r="62"
+                stroke-dasharray="389.56" stroke-dashoffset="389.56"/>
+      </svg>
+      <div class="score-text"><span id="resScore">0</span><small>/ 50</small></div>
+    </div>
+    <p class="result-msg" id="resMsg"></p>
+    <p class="result-detail" id="resDetail"></p>
+    <div class="save-status saving" id="saveStatus"><span id="saveIcon">⏳</span><span id="saveTxt">Saving your score…</span></div>
+    <div class="result-btns">
+      <button class="btn btn-teal btn-sm" id="btnReview">📖 Review Answers</button>
+      <button class="btn btn-gold btn-sm" id="btnRetry">🔄 Retry</button>
+    </div>
+  </div>
+
+  <!-- ══ REVIEW SCREEN ══ -->
+  <div class="screen review-screen" id="reviewScreen">
+    <div class="review-header">
+      <h2>📖 Answer Review</h2>
+      <span class="review-badge" id="reviewBadge">0/50</span>
+    </div>
+    <div class="review-list" id="reviewList"></div>
+    <div class="review-footer">
+      <button class="btn btn-gold btn-sm" id="btnRetryRev">🔄 Retry Quiz</button>
+      <button class="btn btn-outline btn-sm" id="btnBackRes">← Back to Result</button>
+    </div>
+  </div>
+</div>
+
+<script>
+(function(){
+// ══════════════════════════════════════════════════════
+// FIREBASE CONFIG
+// ══════════════════════════════════════════════════════
+const FB_CONFIG = {
+  apiKey:      "AIzaSyBFsiY4iOZ9-QKnZ_inrudYTAJ0F_Usht0",
+  authDomain:  "manoj-demo-4d34f.firebaseapp.com",
+  databaseURL: "https://manoj-demo-4d34f-default-rtdb.firebaseio.com",
+  projectId:   "manoj-demo-4d34f"
+};
+let db = null;
+try{
+  if(!firebase.apps.length) firebase.initializeApp(FB_CONFIG);
+  db = firebase.database();
+}catch(e){ console.warn('Firebase init failed:', e.message); }
+
+// ══════════════════════════════════════════════════════
+// DOM
+// ══════════════════════════════════════════════════════
+const sc = {
+  start:  document.getElementById('startScreen'),
+  name:   document.getElementById('nameScreen'),
+  quiz:   document.getElementById('quizScreen'),
+  result: document.getElementById('resultScreen'),
+  review: document.getElementById('reviewScreen'),
+};
+const E = id => document.getElementById(id);
+const els = {
+  guestContent:    E('guestContent'),
+  returningContent:E('returningContent'),
+  welcomeMsg:      E('welcomeMsg'),
+  historyList:     E('historyList'),
+  btnStart:        E('btnStart'),
+  btnStartRet:     E('btnStartReturning'),
+  btnChangeUser:   E('btnChangeUser'),
+  nameIn:          E('nameIn'),
+  mobIn:           E('mobIn'),
+  nameErr:         E('nameErr'),
+  mobErr:          E('mobErr'),
+  btnBegin:        E('btnBegin'),
+  btnBack:         E('btnBack'),
+  qCounter:        E('qCounter'),
+  playerBadge:     E('playerBadge'),
+  timerDisp:       E('timerDisp'),
+  timerTxt:        E('timerTxt'),
+  timerBar:        E('timerBar'),
+  categoryChip:    E('categoryChip'),
+  progDots:        E('progDots'),
+  qText:           E('qText'),
+  optsList:        E('optsList'),
+  resEmoji:        E('resEmoji'),
+  resName:         E('resName'),
+  resRing:         E('resRing'),
+  resScore:        E('resScore'),
+  resMsg:          E('resMsg'),
+  resDetail:       E('resDetail'),
+  saveStatus:      E('saveStatus'),
+  saveIcon:        E('saveIcon'),
+  saveTxt:         E('saveTxt'),
+  btnReview:       E('btnReview'),
+  btnRetry:        E('btnRetry'),
+  reviewList:      E('reviewList'),
+  reviewBadge:     E('reviewBadge'),
+  btnRetryRev:     E('btnRetryRev'),
+  btnBackRes:      E('btnBackRes'),
+};
+
+// ══════════════════════════════════════════════════════
+// CONSTANTS
+// ══════════════════════════════════════════════════════
+const TOTAL = 50;
+const SECS  = 60;
+const CIRCUM = 2 * Math.PI * 62;
+
+let playerName = '', playerMobile = '', isReturning = false;
+let S = {};
+
+// ══════════════════════════════════════════════════════
+// 50 QUESTIONS — Synonyms & Antonyms (SSC pattern)
+// ══════════════════════════════════════════════════════
+const questions = [
+  // ── SYNONYMS (25) ──────────────────────────────────
+  {type:'SYN', q:'Choose the SYNONYM of "Abate"',
+   opts:['Intensify','Subside','Persist','Elevate'], ans:1,
+   exp:'"Abate" means to become less intense or widespread. "Subside" carries the same meaning. "Intensify" is the antonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Acrimonious"',
+   opts:['Bitter','Gentle','Calm','Polite'], ans:0,
+   exp:'"Acrimonious" means harsh or bitter in manner. "Bitter" is the closest synonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Alacrity"',
+   opts:['Laziness','Slowness','Eagerness','Boredom'], ans:2,
+   exp:'"Alacrity" means brisk and cheerful readiness — i.e., Eagerness. Laziness and Slowness are antonyms.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Ameliorate"',
+   opts:['Worsen','Improve','Damage','Reject'], ans:1,
+   exp:'"Ameliorate" means to make something better or improve. "Worsen" is the antonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Animosity"',
+   opts:['Affection','Hostility','Goodwill','Kindness'], ans:1,
+   exp:'"Animosity" means strong hostility or active hatred. "Hostility" is the correct synonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Apprehensive"',
+   opts:['Confident','Fearful','Brave','Relaxed'], ans:1,
+   exp:'"Apprehensive" means anxious or fearful about the future. "Fearful" is the synonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Arduous"',
+   opts:['Easy','Simple','Strenuous','Effortless'], ans:2,
+   exp:'"Arduous" means involving a lot of effort and difficulty — i.e., Strenuous.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Astute"',
+   opts:['Foolish','Shrewd','Naive','Dull'], ans:1,
+   exp:'"Astute" means having an ability to accurately assess situations — i.e., Shrewd or clever.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Audacious"',
+   opts:['Timid','Bold','Shy','Meek'], ans:1,
+   exp:'"Audacious" means showing a willingness to take surprisingly bold risks — i.e., Bold.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Benign"',
+   opts:['Malignant','Harmless','Dangerous','Lethal'], ans:1,
+   exp:'"Benign" means gentle and kindly, or (in medicine) not harmful. "Harmless" is the synonym.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Cajole"',
+   opts:['Threaten','Coax','Force','Rebuke'], ans:1,
+   exp:'"Cajole" means to persuade someone by flattery or gentle urging — i.e., Coax.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Callous"',
+   opts:['Sensitive','Heartless','Caring','Tender'], ans:1,
+   exp:'"Callous" means showing an insensitive or cruel disregard — i.e., Heartless.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Candid"',
+   opts:['Deceptive','Forthright','Cunning','Vague'], ans:1,
+   exp:'"Candid" means truthful and straightforward — i.e., Forthright.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Clandestine"',
+   opts:['Open','Covert','Public','Transparent'], ans:1,
+   exp:'"Clandestine" means kept secret or done secretively — i.e., Covert.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Cogent"',
+   opts:['Weak','Convincing','Vague','Irrelevant'], ans:1,
+   exp:'"Cogent" means clear, logical, and convincing in its presentation.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Convoluted"',
+   opts:['Simple','Intricate','Direct','Straightforward'], ans:1,
+   exp:'"Convoluted" means extremely complex and difficult to follow — i.e., Intricate.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Curtail"',
+   opts:['Extend','Reduce','Increase','Expand'], ans:1,
+   exp:'"Curtail" means to reduce in extent or quantity — i.e., Reduce.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Debilitate"',
+   opts:['Strengthen','Weaken','Energize','Boost'], ans:1,
+   exp:'"Debilitate" means to make someone weak and infirm — i.e., Weaken.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Deride"',
+   opts:['Praise','Mock','Admire','Respect'], ans:1,
+   exp:'"Deride" means to express contempt for — i.e., to Mock or ridicule.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Diffident"',
+   opts:['Confident','Modest','Arrogant','Bold'], ans:1,
+   exp:'"Diffident" means modest or shy due to lack of self-confidence — i.e., Modest.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Discern"',
+   opts:['Ignore','Perceive','Overlook','Miss'], ans:1,
+   exp:'"Discern" means to perceive or recognize something — i.e., Perceive.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Duplicity"',
+   opts:['Honesty','Deceitfulness','Sincerity','Integrity'], ans:1,
+   exp:'"Duplicity" means deceitfulness or double-dealing — i.e., Deceitfulness.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Eminent"',
+   opts:['Obscure','Distinguished','Unknown','Ordinary'], ans:1,
+   exp:'"Eminent" means famous and respected within a particular sphere — i.e., Distinguished.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Enigmatic"',
+   opts:['Clear','Mysterious','Obvious','Transparent'], ans:1,
+   exp:'"Enigmatic" means difficult to interpret or understand — i.e., Mysterious.'},
+  {type:'SYN', q:'Choose the SYNONYM of "Exorbitant"',
+   opts:['Reasonable','Excessive','Fair','Moderate'], ans:1,
+   exp:'"Exorbitant" means unreasonably high (especially of a price or demand) — i.e., Excessive.'},
+
+  // ── ANTONYMS (25) ──────────────────────────────────
+  {type:'ANT', q:'Choose the ANTONYM of "Abundant"',
+   opts:['Plentiful','Scarce','Ample','Lavish'], ans:1,
+   exp:'"Abundant" means existing in large quantities. Its antonym is "Scarce" — available in limited supply.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Belligerent"',
+   opts:['Hostile','Aggressive','Peaceful','Combative'], ans:2,
+   exp:'"Belligerent" means hostile or aggressive. Its antonym is "Peaceful" — not aggressive.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Blatant"',
+   opts:['Obvious','Subtle','Flagrant','Bald-faced'], ans:1,
+   exp:'"Blatant" means done openly and unashamedly. Its antonym is "Subtle" — done discreetly.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Brevity"',
+   opts:['Conciseness','Verbosity','Shortness','Terseness'], ans:1,
+   exp:'"Brevity" means conciseness of expression. Its antonym is "Verbosity" — using more words than needed.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Buoyant"',
+   opts:['Cheerful','Despondent','Lively','Optimistic'], ans:1,
+   exp:'"Buoyant" means cheerful and optimistic. Its antonym is "Despondent" — in low spirits.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Capricious"',
+   opts:['Whimsical','Fickle','Consistent','Erratic'], ans:2,
+   exp:'"Capricious" means given to sudden changes of mood. Its antonym is "Consistent" — behaving the same way.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Censure"',
+   opts:['Condemn','Criticise','Commend','Denounce'], ans:2,
+   exp:'"Censure" means to express severe disapproval. Its antonym is "Commend" — to praise formally.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Condone"',
+   opts:['Overlook','Pardon','Condemn','Allow'], ans:2,
+   exp:'"Condone" means to accept or allow behavior that is wrong. Its antonym is "Condemn" — to express complete disapproval.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Contrite"',
+   opts:['Remorseful','Penitent','Impenitent','Sorry'], ans:2,
+   exp:'"Contrite" means feeling or expressing remorse. Its antonym is "Impenitent" — not feeling sorry.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Cowardice"',
+   opts:['Fear','Timidity','Valour','Weakness'], ans:2,
+   exp:'"Cowardice" means lack of bravery. Its antonym is "Valour" — great courage in the face of danger.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Decadent"',
+   opts:['Degenerate','Corrupt','Virtuous','Immoral'], ans:2,
+   exp:'"Decadent" means characterized by moral or cultural decline. Its antonym is "Virtuous" — having good moral qualities.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Defer"',
+   opts:['Postpone','Delay','Hasten','Procrastinate'], ans:2,
+   exp:'"Defer" means to put off to a later time. Its antonym is "Hasten" — to be quick to do something.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Diligent"',
+   opts:['Hardworking','Industrious','Indolent','Assiduous'], ans:2,
+   exp:'"Diligent" means having or showing care and conscientiousness. Its antonym is "Indolent" — wanting to avoid activity.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Docile"',
+   opts:['Compliant','Obedient','Intractable','Submissive'], ans:2,
+   exp:'"Docile" means ready to accept control or instruction. Its antonym is "Intractable" — hard to control or deal with.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Dreary"',
+   opts:['Bleak','Dull','Cheerful','Gloomy'], ans:2,
+   exp:'"Dreary" means dull, bleak, and lifeless. Its antonym is "Cheerful" — noticeably happy and optimistic.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Economical"',
+   opts:['Thrifty','Frugal','Wasteful','Sparing'], ans:2,
+   exp:'"Economical" means giving good value or return in relation to money spent. Its antonym is "Wasteful" — using more than necessary.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Elated"',
+   opts:['Joyful','Ecstatic','Dejected','Euphoric'], ans:2,
+   exp:'"Elated" means very happy and excited. Its antonym is "Dejected" — sad and dispirited.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Explicit"',
+   opts:['Clear','Definite','Vague','Specific'], ans:2,
+   exp:'"Explicit" means stated clearly and in detail. Its antonym is "Vague" — not clearly expressed or understood.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Feeble"',
+   opts:['Weak','Frail','Robust','Infirm'], ans:2,
+   exp:'"Feeble" means lacking physical strength. Its antonym is "Robust" — strong and healthy.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Frugal"',
+   opts:['Thrifty','Abstemious','Extravagant','Careful'], ans:2,
+   exp:'"Frugal" means sparing or economical with money. Its antonym is "Extravagant" — lacking restraint in spending.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Garrulous"',
+   opts:['Talkative','Loquacious','Taciturn','Chatty'], ans:2,
+   exp:'"Garrulous" means excessively talkative. Its antonym is "Taciturn" — reserved or uncommunicative in speech.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Generous"',
+   opts:['Liberal','Munificent','Miserly','Bountiful'], ans:2,
+   exp:'"Generous" means showing readiness to give more than expected. Its antonym is "Miserly" — unwilling to spend money.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Gratitude"',
+   opts:['Thankfulness','Appreciation','Ingratitude','Gratefulness'], ans:2,
+   exp:'"Gratitude" means the quality of being thankful. Its antonym is "Ingratitude" — failure to show thankfulness.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Haughty"',
+   opts:['Arrogant','Proud','Humble','Disdainful'], ans:2,
+   exp:'"Haughty" means having an air of superior importance. Its antonym is "Humble" — having a modest opinion of oneself.'},
+  {type:'ANT', q:'Choose the ANTONYM of "Inevitable"',
+   opts:['Certain','Unavoidable','Avoidable','Inescapable'], ans:2,
+   exp:'"Inevitable" means certain to happen. Its antonym is "Avoidable" — able to be prevented or avoided.'},
+];
+
+// ══════════════════════════════════════════════════════
+// SCREEN NAV
+// ══════════════════════════════════════════════════════
+function show(name){
+  Object.values(sc).forEach(s=>s.classList.remove('active'));
+  const t=sc[name]; if(!t)return;
+  t.style.animation='none'; t.offsetHeight; t.style.animation='';
+  t.classList.add('active');
+}
+
+// ══════════════════════════════════════════════════════
+// STATE
+// ══════════════════════════════════════════════════════
+function resetState(){
+  S={idx:0,score:0,answers:[],timeLeft:SECS,timer:null,startTime:0,
+     finished:false,totalTime:0,locked:false};
+}
+
+// ══════════════════════════════════════════════════════
+// PROGRESS DOTS
+// ══════════════════════════════════════════════════════
+function buildDots(){
+  els.progDots.innerHTML='';
+  for(let i=0;i<TOTAL;i++){
+    const d=document.createElement('span');
+    d.className='prog-dot';
+    if(i<S.answers.length){
+      const a=S.answers[i];
+      d.classList.add(a.sel===-1?'skip':a.ok?'done':'wrong');
+    } else if(i===S.idx&&!S.finished) d.classList.add('cur');
+    d.title=`Q${i+1}`;
+    els.progDots.appendChild(d);
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// LOAD QUESTION
+// ══════════════════════════════════════════════════════
+function loadQ(){
+  if(S.idx>=TOTAL){finish();return;}
+  S.locked=false; S.timeLeft=SECS; S.startTime=Date.now();
+  const q=questions[S.idx];
+  els.qCounter.textContent=`Q ${S.idx+1}/${TOTAL}`;
+  els.qText.textContent=q.q;
+  // category chip
+  els.categoryChip.innerHTML=q.type==='SYN'
+    ?'<span class="category-chip cat-syn">🔵 Synonym</span>'
+    :'<span class="category-chip cat-ant">🔴 Antonym</span>';
+  // options
+  els.optsList.innerHTML='';
+  ['A','B','C','D'].forEach((L,idx)=>{
+    const li=document.createElement('li');
+    const btn=document.createElement('button');
+    btn.className='opt-btn';
+    btn.innerHTML=`<span class="opt-letter">${L}</span><span>${esc(q.opts[idx])}</span>`;
+    btn.addEventListener('click',()=>onOpt(idx,btn));
+    li.appendChild(btn);
+    els.optsList.appendChild(li);
+  });
+  // timer bar reset
+  els.timerBar.classList.remove('warn','urg');
+  els.timerBar.style.width='100%';
+  els.timerDisp.classList.remove('warn','urg');
+  els.timerTxt.textContent=`${SECS}s`;
+  dotColor(SECS);
+  buildDots();
+  startTimer();
+}
+
+function dotColor(s){
+  const d=els.timerDisp.querySelector('.t-dot');
+  d.style.background=s<=10?'var(--rose)':s<=20?'var(--gold)':'var(--sage)';
+}
+
+function startTimer(){
+  clearInterval(S.timer);
+  S.startTime=Date.now();
+  S.timer=setInterval(()=>{
+    const rem=Math.max(0,SECS-(Date.now()-S.startTime)/1000);
+    S.timeLeft=rem;
+    els.timerBar.style.width=`${(rem/SECS)*100}%`;
+    els.timerTxt.textContent=`${Math.ceil(rem)}s`;
+    dotColor(Math.ceil(rem));
+    els.timerBar.classList.remove('warn','urg');
+    els.timerDisp.classList.remove('warn','urg');
+    if(rem<=10){els.timerBar.classList.add('urg');els.timerDisp.classList.add('urg');}
+    else if(rem<=20){els.timerBar.classList.add('warn');els.timerDisp.classList.add('warn');}
+    if(rem<=0) onTimeout();
+  },100);
+}
+
+function stopTimer(){clearInterval(S.timer);S.timer=null;}
+
+function onTimeout(){
+  if(S.locked)return; S.locked=true; stopTimer();
+  const q=questions[S.idx];
+  const btns=els.optsList.querySelectorAll('.opt-btn');
+  btns.forEach(b=>b.classList.add('dis'));
+  btns[q.ans].classList.add('reveal');
+  S.answers.push({sel:-1,ans:q.ans,ok:false});
+  S.totalTime+=SECS;
+  buildDots();
+  setTimeout(advance,900);
+}
+
+function onOpt(sel,btn){
+  if(S.locked)return; S.locked=true; stopTimer();
+  const q=questions[S.idx];
+  const ok=sel===q.ans;
+  const btns=els.optsList.querySelectorAll('.opt-btn');
+  const elapsed=(Date.now()-S.startTime)/1000;
+  S.totalTime+=Math.min(elapsed,SECS);
+  btns.forEach(b=>b.classList.add('dis'));
+  btns[q.ans].classList.add('correct');
+  if(ok){S.score++;}
+  else{btn.classList.add('wrong');btns[q.ans].classList.add('reveal');}
+  S.answers.push({sel,ans:q.ans,ok});
+  buildDots();
+  setTimeout(advance,ok?700:1000);
+}
+
+function advance(){S.idx++;S.idx>=TOTAL?finish():loadQ();}
+
+// ══════════════════════════════════════════════════════
+// FINISH & RESULTS
+// ══════════════════════════════════════════════════════
+function finish(){
+  stopTimer(); S.finished=true; buildDots();
+  showResults(); autoSave();
+}
+
+function showResults(){
+  show('result');
+  const pct=Math.round((S.score/TOTAL)*100);
+  const off=CIRCUM-(pct/100)*CIRCUM;
+  els.resName.textContent=`👤 ${playerName} (${playerMobile})`;
+  els.resRing.style.strokeDasharray=CIRCUM;
+  els.resRing.style.strokeDashoffset=CIRCUM;
+  let col='var(--rose)';
+  if(pct>=80) col='var(--sage)';
+  else if(pct>=60) col='var(--gold)';
+  else if(pct>=40) col='#f97316';
+  els.resRing.style.stroke=col;
+  requestAnimationFrame(()=>requestAnimationFrame(()=>{els.resRing.style.strokeDashoffset=off;}));
+  animCount(els.resScore,0,S.score,1000);
+  let e,m;
+  if(pct>=90){e='🏆';m="Outstanding! Vocabulary master!";}
+  else if(pct>=75){e='🌟';m="Excellent! Strong vocabulary skills!";}
+  else if(pct>=60){e='👍';m="Good effort! Keep building your vocab.";}
+  else if(pct>=40){e='📚';m="Fair attempt. More practice needed.";}
+  else{e='💪';m="Keep learning! Synonyms & antonyms need daily practice.";}
+  els.resEmoji.textContent=e;
+  els.resMsg.textContent=m;
+  els.resDetail.textContent=`Scored ${S.score}/50 (${pct}%) in ${fmtTime(S.totalTime)}.`;
+  setSave('saving','⏳','Saving your score…');
+}
+
+function setSave(cls,icon,txt){
+  els.saveStatus.className=`save-status ${cls}`;
+  els.saveIcon.textContent=icon;
+  els.saveTxt.textContent=txt;
+}
+
+async function autoSave(){
+  if(!db){setSave('err','⚠️','Firebase unavailable. Score not saved.');return;}
+  const pct=Math.round((S.score/TOTAL)*100);
+  const d={name:playerName,mobile:playerMobile,score:S.score,total:TOTAL,
+           percentage:pct,timeTaken:Math.round(S.totalTime),timestamp:new Date().toISOString(),quizType:'synonyms-antonyms'};
+  try{
+    await db.ref('quizResults_vocab').push(d);
+    setSave('saved','✅',`Score saved for "${playerName}"!`);
+  }catch(err){
+    if(err.message&&err.message.includes('PERMISSION_DENIED'))
+      setSave('err','⚠️','Save failed: Update Firebase rules.');
+    else if(!navigator.onLine)
+      setSave('err','📵','No internet. Score not saved.');
+    else
+      setSave('err','⚠️','Save failed. Check Firebase connection.');
+  }
+}
+
+// ══════════════════════════════════════════════════════
+// REVIEW
+// ══════════════════════════════════════════════════════
+function buildReview(){
+  els.reviewBadge.textContent=`${S.score}/${TOTAL}`;
+  els.reviewList.innerHTML='';
+  const L=['A','B','C','D'];
+  questions.forEach((q,i)=>{
+    const a=S.answers[i];
+    const ok=a&&a.ok, skip=a&&a.sel===-1;
+    const card=document.createElement('div');
+    card.className=`r-card ${ok?'r-correct':skip?'r-skip':'r-wrong'}`;
+    const hdr=document.createElement('div'); hdr.className='r-card-hdr';
+    hdr.innerHTML=`<span class="r-q-num">${i+1}</span><span class="r-q-text">${esc(q.q)}</span>`;
+    card.appendChild(hdr);
+    const body=document.createElement('div'); body.className='r-card-body';
+    if(skip){
+      body.innerHTML+=`<div class="r-row"><span class="r-label label-s">⏰ Time Up</span><span class="r-ans-txt" style="color:var(--text-3)">Not answered.</span></div>`;
+    } else if(!ok){
+      body.innerHTML+=`<div class="r-row"><span class="r-label label-y">✗ Your Ans</span><span class="r-ans-txt">${esc(L[a.sel]+'. '+q.opts[a.sel])}</span></div>`;
+    }
+    body.innerHTML+=`<div class="r-row"><span class="r-label label-c">✓ Correct</span><span class="r-ans-txt">${esc(L[q.ans]+'. '+q.opts[q.ans])}</span></div>`;
+    body.innerHTML+=`<div class="r-exp"><strong>💡 Explanation</strong>${esc(q.exp)}</div>`;
+    card.appendChild(body);
+    els.reviewList.appendChild(card);
+  });
+  els.reviewList.scrollTop=0;
+}
+
+// ══════════════════════════════════════════════════════
+// HELPERS
+// ══════════════════════════════════════════════════════
+function animCount(el,s,e,dur){
+  const t0=performance.now();
+  (function u(now){
+    const p=Math.min((now-t0)/dur,1),ease=1-Math.pow(1-p,3);
+    el.textContent=Math.round(s+(e-s)*ease);
+    p<1?requestAnimationFrame(u):el.textContent=e;
+  })(t0);
+}
+function fmtTime(sec){const m=Math.floor(sec/60),s=Math.floor(sec%60);return m>0?`${m}m ${s}s`:`${s}s`;}
+function esc(str){const d=document.createElement('div');d.textContent=str;return d.innerHTML;}
+
+function startQuiz(){
+  resetState();
+  els.playerBadge.textContent=`👤 ${playerName}`;
+  show('quiz'); loadQ();
+}
+
+// ══════════════════════════════════════════════════════
+// USER MANAGEMENT
+// ══════════════════════════════════════════════════════
+async function saveUser(name,mobile){
+  if(!db)return;
+  try{await db.ref('login_vocab/'+mobile).set({name,mobile,registeredAt:new Date().toISOString()});}
+  catch(e){console.error(e);}
+}
+async function getUser(mobile){
+  if(!db)return null;
+  try{const s=await db.ref('login_vocab/'+mobile).once('value');const d=s.val();return d&&d.name?d.name:null;}
+  catch{return null;}
+}
+async function loadHistory(mobile){
+  els.historyList.innerHTML='<p style="text-align:center;color:var(--text-3)">Loading…</p>';
+  if(!db){els.historyList.innerHTML='<p style="text-align:center;color:var(--text-3)">Firebase unavailable</p>';return;}
+  try{
+    const snap=await db.ref('quizResults_vocab').orderByChild('mobile').equalTo(mobile).limitToLast(5).once('value');
+    const res=snap.val();
+    if(!res){els.historyList.innerHTML='<p style="text-align:center;color:var(--text-3)">No previous scores</p>';return;}
+    const arr=Object.values(res).sort((a,b)=>(b.timestamp||'').localeCompare(a.timestamp||''));
+    els.historyList.innerHTML='';
+    arr.forEach(r=>{
+      const el=document.createElement('div');
+      el.className='history-item';
+      el.innerHTML=`<span>${esc(r.name)}</span><span class="history-score">${r.score}/${r.total} (${r.percentage}%)</span><span class="history-date">${r.timestamp?new Date(r.timestamp).toLocaleDateString():'N/A'}</span>`;
+      els.historyList.appendChild(el);
+    });
+  }catch{els.historyList.innerHTML='<p style="text-align:center;color:var(--text-3)">Could not load history</p>';}
+}
+
+function showReturning(name,mobile){
+  isReturning=true; playerName=name; playerMobile=mobile;
+  els.guestContent.style.display='none';
+  els.returningContent.style.display='flex';
+  els.welcomeMsg.textContent=`Welcome back, ${name}!`;
+  loadHistory(mobile);
+  show('start');
+}
+function showGuest(){
+  isReturning=false; playerName=''; playerMobile='';
+  els.guestContent.style.display='flex';
+  els.returningContent.style.display='none';
+  show('start');
+}
+
+async function initSession(){
+  const m=localStorage.getItem('vocabQuizUser');
+  if(!m){showGuest();return;}
+  if(db){
+    const n=await getUser(m);
+    if(n){showReturning(n,m);return;}
+    else localStorage.removeItem('vocabQuizUser');
+  } else localStorage.removeItem('vocabQuizUser');
+  showGuest();
+}
+
+// ══════════════════════════════════════════════════════
+// EVENTS
+// ══════════════════════════════════════════════════════
+els.btnStart.addEventListener('click',()=>{
+  els.nameIn.value=localStorage.getItem('vocabPlayerName')||'';
+  els.mobIn.value=''; els.nameErr.textContent=''; els.mobErr.textContent='';
+  show('name'); setTimeout(()=>els.nameIn.focus(),300);
+});
+
+els.btnStartRet.addEventListener('click',()=>{
+  if(!playerName||!playerMobile){showGuest();return;}
+  startQuiz();
+});
+
+els.btnChangeUser.addEventListener('click',()=>{
+  localStorage.removeItem('vocabQuizUser'); localStorage.removeItem('vocabPlayerName');
+  playerName=''; playerMobile=''; showGuest();
+});
+
+els.btnBack.addEventListener('click',()=>{ isReturning?showReturning(playerName,playerMobile):showGuest(); });
+
+els.nameIn.addEventListener('keydown',e=>{if(e.key==='Enter')els.mobIn.focus();});
+els.mobIn.addEventListener('keydown',e=>{if(e.key==='Enter')els.btnBegin.click();});
+
+els.btnBegin.addEventListener('click',async()=>{
+  const n=els.nameIn.value.trim();
+  if(!n){els.nameErr.textContent='⚠️ Please enter your name.';els.nameIn.focus();return;}
+  if(n.length<2){els.nameErr.textContent='⚠️ At least 2 characters.';els.nameIn.focus();return;}
+  els.nameErr.textContent='';
+  const m=els.mobIn.value.trim();
+  if(!m){els.mobErr.textContent='⚠️ Please enter mobile number.';els.mobIn.focus();return;}
+  if(!/^\d{10}$/.test(m)){els.mobErr.textContent='⚠️ Must be exactly 10 digits.';els.mobIn.focus();return;}
+  els.mobErr.textContent='';
+  if(db){
+    const existing=await getUser(m);
+    if(existing){
+      playerName=existing; playerMobile=m;
+      localStorage.setItem('vocabQuizUser',m); localStorage.setItem('vocabPlayerName',existing);
+      startQuiz(); return;
+    }
+  }
+  playerName=n; playerMobile=m;
+  localStorage.setItem('vocabQuizUser',m); localStorage.setItem('vocabPlayerName',n);
+  if(db) await saveUser(n,m);
+  startQuiz();
+});
+
+els.btnReview.addEventListener('click',()=>{buildReview();show('review');});
+els.btnBackRes.addEventListener('click',()=>show('result'));
+els.btnRetry.addEventListener('click',()=>startQuiz());
+els.btnRetryRev.addEventListener('click',()=>startQuiz());
+
+// ══════════════════════════════════════════════════════
+// INIT
+// ══════════════════════════════════════════════════════
+function init(){
+  els.resRing.style.strokeDasharray=CIRCUM;
+  els.resRing.style.strokeDashoffset=CIRCUM;
+  els.resScore.textContent='0';
+  initSession();
+}
+init();
+})();
+</script>
+</body>
+</html>
